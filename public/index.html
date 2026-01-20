@@ -3,103 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambola Multiplayer</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <title>Tambola Live - Global Multiplayer Housie Game</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎲 Tambola Multiplayer</h1>
-        </header>
-
-        <div id="homeScreen" class="screen active">
-            <div class="card">
-                <h2>Welcome to Tambola!</h2>
-                <div class="button-group">
-                    <button onclick="showHostScreen()" class="btn btn-primary">Host a Game</button>
-                    <button onclick="showJoinScreen()" class="btn btn-secondary">Join a Game</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="hostScreen" class="screen">
-            <div class="card">
-                <h2>Host a Game</h2>
-                <input type="text" id="hostName" placeholder="Your Name" class="input">
-                <input type="number" id="entryFee" placeholder="Entry Fee (₹)" value="100" class="input">
-                <div class="button-group">
-                    <button onclick="createGame()" class="btn btn-primary">Create Game</button>
-                    <button onclick="showHomeScreen()" class="btn btn-secondary">Back</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="joinScreen" class="screen">
-            <div class="card">
-                <h2>Join a Game</h2>
-                <input type="text" id="playerName" placeholder="Your Name" class="input">
-                <input type="text" id="gameCode" placeholder="Game Code" class="input" style="text-transform: uppercase;">
-                <div class="button-group">
-                    <button onclick="joinGame()" class="btn btn-primary">Join & Pay</button>
-                    <button onclick="showHomeScreen()" class="btn btn-secondary">Back</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="lobbyScreen" class="screen">
-            <div class="card">
-                <h2>Game Lobby</h2>
-                <div class="info-box">
-                    <p><strong>Game Code:</strong> <span id="lobbyGameCode" class="highlight"></span></p>
-                    <p><strong>Players:</strong> <span id="playerCount">0</span></p>
-                    <p><strong>Prize Pool:</strong> ₹<span id="prizePool">0</span></p>
-                </div>
-                <div id="playersList" class="players-list"></div>
-                <div id="hostControls" style="display: none;">
-                    <button onclick="startGame()" class="btn btn-success">Start Game</button>
-                </div>
-                <p class="waiting-text">Waiting for host to start the game...</p>
-            </div>
-        </div>
-
-        <div id="gameScreen" class="screen">
-            <div class="game-layout">
-                <div class="game-info">
-                    <div class="info-card">
-                        <h3>Current Number</h3>
-                        <div id="currentNumber" class="current-number">-</div>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="18" fill="url(#gradient1)"/>
+                            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="20" font-weight="bold">T</text>
+                            <defs>
+                                <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+                                    <stop offset="0%" stop-color="#667eea"/>
+                                    <stop offset="100%" stop-color="#764ba2"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
                     </div>
-                    <div class="info-card">
-                        <h3>Called Numbers</h3>
-                        <div id="calledNumbers" class="called-numbers"></div>
+                    <span class="logo-text">Tambola<span class="logo-live">Live</span></span>
+                </div>
+                
+                <div class="nav-menu" id="navMenu">
+                    <a href="#home" class="nav-link active">Home</a>
+                    <a href="#games" class="nav-link">Games</a>
+                    <a href="#how-to-play" class="nav-link">How to Play</a>
+                    <a href="#prizes" class="nav-link">Prizes</a>
+                </div>
+                
+                <div class="nav-actions">
+                    <div class="wallet-display" id="walletDisplay" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="6" width="18" height="14" rx="2" stroke-width="2"/>
+                            <path d="M3 10h18" stroke-width="2"/>
+                        </svg>
+                        <span id="walletBalance">$0.00</span>
                     </div>
+                    <button class="btn btn-outline" id="loginBtn">Sign In</button>
+                    <button class="btn btn-primary" id="registerBtn">Get Started</button>
+                    <button class="btn btn-icon" id="mobileMenuToggle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="3" y1="12" x2="21" y2="12" stroke-width="2"/>
+                            <line x1="3" y1="6" x2="21" y2="6" stroke-width="2"/>
+                            <line x1="3" y1="18" x2="21" y2="18" stroke-width="2"/>
+                        </svg>
+                    </button>
                 </div>
-
-                <div class="ticket-container">
-                    <h3>Your Ticket</h3>
-                    <div id="ticket" class="ticket"></div>
-                    <div class="claims">
-                        <button onclick="claimWin('earlyFive')" class="btn btn-claim">Early Five</button>
-                        <button onclick="claimWin('topLine')" class="btn btn-claim">Top Line</button>
-                        <button onclick="claimWin('middleLine')" class="btn btn-claim">Middle Line</button>
-                        <button onclick="claimWin('bottomLine')" class="btn btn-claim">Bottom Line</button>
-                        <button onclick="claimWin('fullHouse')" class="btn btn-claim">Full House</button>
-                    </div>
-                </div>
-
-                <div id="masterControls" style="display: none;" class="master-controls">
-                    <button onclick="callNumber()" class="btn btn-primary btn-large">Call Next Number</button>
-                </div>
-
-                <div id="winners" class="winners"></div>
             </div>
         </div>
-    </div>
+    </nav>
 
-    <div id="notification" class="notification"></div>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-background">
+            <div class="hero-gradient"></div>
+            <div class="floating-numbers">
+                <span class="number" style="--delay: 0s; --x: 10%; --y: 20%">7</span>
+                <span class="number" style="--delay: 1s; --x: 80%; --y: 30%">21</span>
+                <span class="number" style="--delay: 2s; --x: 15%; --y: 70%">45</span>
+                <span class="number" style="--delay: 3s; --x: 85%; --y: 60%">63</span>
+                <span class="number" style="--delay: 4s; --x: 50%; --y: 15%">89</span>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>🌍 Play with players worldwide</span>
+                </div>
+                <h1 class="hero-title">
+                    Win Big with
+                    <span class="gradient-text">Tambola Live</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Experience the thrill of multiplayer Housie/Bingo with real-time gameplay,
+                    instant payouts, and exciting prizes from anywhere in the world.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn btn-large btn-primary" id="playNowBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        Play Now
+                    </button>
+                    <button class="btn btn-large btn-outline-white" id="watchDemoBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                            <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/>
+                        </svg>
+                        Watch Demo
+                    </button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">10K+</div>
+                        <div class="stat-label">Active Players</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">$50K+</div>
+                        <div class="stat-label">Prizes Won</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">150+</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <script src="app.js"></script>
+    <!-- Live Games Section -->
+    <section class="section" id="games">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">🎮 Live Now</div>
+                <h2 class="section-title">Active Games</h2>
+                <p class="section-subtitle">Join a game instantly or create your own</p>
+            </div>
+            
+            <div class="games-tabs">
+                <button class="tab-btn active" data-tab="all">All Games</button>
+                <button class="tab-btn" data-tab="beginner">Beginner</button>
+                <button class="tab-btn" data-tab="pro">Pro</button>
+                <button class="tab-btn" data-tab="jackpot">Jackpot</button>
+            </div>
+            
+            <div class="games-grid" id="gamesGrid">
+                <!-- Games will be loaded dynamically -->
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading games...</p>
+                </div>
+            </div>
+            
+            <div class="create-game-cta">
+                <div class="cta-content">
+                    <h3>Want to host your own game?</h3>
+                    <p>Create a custom game with your own rules and prize pool</p>
+                </div>
+                <button class="btn btn-primary btn-large" id="createGameBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="12" y1="5" x2="12" y2="19" stroke-width="2"/>
+                        <line x1="5" y1="12" x2="19" y2="12" stroke-width="2"/>
+                    </svg>
+                    Create Game
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Play Section -->
+    <section class="section section-dark" id="how-to-play">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">📖 Tutorial</div>
+                <h2 class="section-title">How to Play</h2>
+                <p class="section-subtitle">Start winning in 3 simple steps</p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">🎫</div>
+                    <h3 class="step-title">Buy Tickets</h3>
+                    <p class="step-description">Browse active games and purchase tickets using your preferred payment method</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">🎲</div>
+                    <h3 class="step-title">Play Live</h3>
+                    <p class="step-description">Watch numbers being called live and mark them on your ticket automatically</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">🏆</div>
+                    <h3 class="step-title">Win Prizes</h3>
+                    <p class="step-description">Complete patterns to win! Get instant payouts directly to your bank account</p>
+                </div>
+            </div>
+            
+            <div class="winning-patterns">
+                <h3 class="patterns-title">Winning Patterns</h3>
+                <div class="patterns-grid">
+                    <div class="pattern-card">
+                        <div class="pattern-name">Early Five</div>
+                        <div class="pattern-grid">
+                            <div class="mini-ticket">
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span></span>
+                                <span class="marked"></span>
+                                <span></span>
+                                <span></span>
+                                <span class="marked"></span>
+                                <span></span>
+                                <span class="marked"></span>
+                            </div>
+                        </div>
+                        <div class="pattern-prize">First 5 numbers</div>
+                    </div>
+                    <div class="pattern-card">
+                        <div class="pattern-name">Top Line</div>
+                        <div class="pattern-grid">
+                            <div class="mini-ticket">
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                            </div>
+                        </div>
+                        <div class="pattern-prize">Complete top row</div>
+                    </div>
+                    <div class="pattern-card">
+                        <div class="pattern-name">Full House</div>
+                        <div class="pattern-grid">
+                            <div class="mini-ticket full">
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                                <span class="marked"></span>
+                            </div>
+                        </div>
+                        <div class="pattern-prize">All numbers marked</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">✨ Features</div>
+                <h2 class="section-title">Why Choose Tambola Live?</h2>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Real-Time Gameplay</h3>
+                    <p>Experience seamless live games with instant number updates and zero lag</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3>50+ Payment Methods</h3>
+                    <p>Pay with UPI, cards, wallets, or bank transfers in your local currency</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Global Payouts</h3>
+                    <p>Withdraw winnings to your bank account in 160+ countries</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h3>Auto Verification</h3>
+                    <p>Smart system verifies wins automatically - no manual claims needed</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Fair</h3>
+                    <p>Bank-level encryption and provably fair number generation</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Play anywhere, anytime on any device - responsive design</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="18" fill="url(#gradient2)"/>
+                            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="20" font-weight="bold">T</text>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="40" y2="40">
+                                    <stop offset="0%" stop-color="#667eea"/>
+                                    <stop offset="100%" stop-color="#764ba2"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <p class="footer-tagline">The world's most exciting multiplayer Tambola platform</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="#">Features</a>
+                        <a href="#">Pricing</a>
+                        <a href="#">Security</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Support</h4>
+                        <a href="#">Help Center</a>
+                        <a href="#">Contact Us</a>
+                        <a href="#">FAQ</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Responsible Gaming</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Tambola Live. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#">Twitter</a>
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="gameModal" class="modal"></div>
+    <div id="authModal" class="modal"></div>
+    <div id="paymentModal" class="modal"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/game.js"></script>
+    <script src="/js/payment.js"></script>
 </body>
 </html>
