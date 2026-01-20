@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Tambola Live</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/redesign.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        
+        .auth-card {
+            max-width: 480px;
+            width: 100%;
+            padding: 48px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .auth-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+        
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: white;
+        }
+        
+        .auth-subtitle {
+            color: var(--gray-400);
+        }
+        
+        .test-accounts {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .test-accounts h3 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--primary-500);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .test-account {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .test-account:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .test-account:last-child {
+            margin-bottom: 0;
+        }
+        
+        .account-type {
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .account-creds {
+            font-size: 0.875rem;
+            color: var(--gray-400);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gray-300);
+            font-size: 0.875rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .form-input::placeholder {
+            color: var(--gray-500);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 12px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--gray-400);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="/" class="auth-logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <circle cx="20" cy="20" r="18" fill="url(#gradient)"/>
+                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="22" font-weight="800">T</text>
+                        <defs>
+                            <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#6366f1"/>
+                                <stop offset="100%" stop-color="#a855f7"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    Tambola Live
+                </a>
+                <h1 class="auth-title" id="authTitle">Welcome Back</h1>
+                <p class="auth-subtitle" id="authSubtitle">Sign in to your account</p>
+            </div>
+
+            <!-- Test Accounts -->
+            <div class="test-accounts">
+                <h3>🎮 Quick Test Accounts</h3>
+                <div class="test-account" onclick="useTestAccount('host')">
+                    <div class="account-type">🎯 Host Account</div>
+                    <div class="account-creds">host@tambola.com / host123</div>
+                </div>
+                <div class="test-account" onclick="useTestAccount('player')">
+                    <div class="account-type">👤 Player Account</div>
+                    <div class="account-creds">player@tambola.com / player123</div>
+                </div>
+            </div>
+
+            <div class="divider">or continue with email</div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+                <button class="tab-btn" onclick="switchTab('register')">Sign Up</button>
+            </div>
+
+            <!-- Alert -->
+            <div id="alert" style="display: none;"></div>
+
+            <!-- Login Form -->
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div id="usernameGroup" class="form-group" style="display: none;">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="username" class="form-input" placeholder="Enter username">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+                </div>
+
+                <div id="roleGroup" class="form-group" style="display: none;">
+                    <label class="form-label">I want to</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <label style="padding: 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                            <input type="radio" name="role" value="user" checked style="accent-color: var(--primary-500);">
+                            <span>Play Games</span>
+                        </label>
+                        <label style="padding: 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                            <input type="radio" name="role" value="host" style="accent-color: var(--primary-500);">
+                            <span>Host Games</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary gradient-shine" style="width: 100%; margin-top: 24px;" id="submitBtn">
+                    <span>Sign In</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 24px; color: var(--gray-500); font-size: 0.875rem;">
+                <a href="/" style="color: var(--primary-500); text-decoration: none; font-weight: 600;">← Back to Home</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'login';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const usernameGroup = document.getElementById('usernameGroup');
+            const roleGroup = document.getElementById('roleGroup');
+            const authTitle = document.getElementById('authTitle');
+            const authSubtitle = document.getElementById('authSubtitle');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (mode === 'register') {
+                usernameGroup.style.display = 'block';
+                roleGroup.style.display = 'block';
+                authTitle.textContent = 'Create Account';
+                authSubtitle.textContent = 'Join thousands of players';
+                submitBtn.querySelector('span').textContent = 'Sign Up';
+            } else {
+                usernameGroup.style.display = 'none';
+                roleGroup.style.display = 'none';
+                authTitle.textContent = 'Welcome Back';
+                authSubtitle.textContent = 'Sign in to your account';
+                submitBtn.querySelector('span').textContent = 'Sign In';
+            }
+
+            hideAlert();
+        }
+
+        function useTestAccount(type) {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            if (type === 'host') {
+                emailInput.value = 'host@tambola.com';
+                passwordInput.value = 'host123';
+            } else {
+                emailInput.value = 'player@tambola.com';
+                passwordInput.value = 'player123';
+            }
+
+            showAlert('Test account loaded! Click Sign In to continue.', 'success');
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            const data = { email, password };
+
+            if (currentMode === 'register') {
+                data.username = document.getElementById('username').value;
+                data.role = document.querySelector('input[name="role"]:checked').value;
+            }
+
+            // Show loading
+            submitBtn.disabled = true;
+            submitBtn.querySelector('span').textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`/api/auth/${currentMode}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Save token and user
+                    localStorage.setItem('authToken', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+
+                    showAlert('Success! Redirecting...', 'success');
+
+                    // Redirect after short delay
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showAlert(result.error || 'Authentication failed', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.querySelector('span').textContent = currentMode === 'login' ? 'Sign In' : 'Sign Up';
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+                showAlert('Connection error. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.querySelector('span').textContent = currentMode === 'login' ? 'Sign In' : 'Sign Up';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+        }
+
+        function hideAlert() {
+            document.getElementById('alert').style.display = 'none';
+        }
+
+        // Check if already logged in
+        if (localStorage.getItem('authToken')) {
+            showAlert('You are already logged in. Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
