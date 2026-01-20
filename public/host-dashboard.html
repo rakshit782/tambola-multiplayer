@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Dashboard - Tambola Live</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/redesign.css">
+    <style>
+        .dashboard {
+            min-height: 100vh;
+            padding: 100px 0 40px;
+        }
+        
+        .dashboard-header {
+            margin-bottom: 40px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            color: var(--gray-400);
+            font-size: 0.875rem;
+        }
+        
+        .stat-change {
+            margin-top: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .stat-change.positive {
+            color: #10b981;
+        }
+        
+        .stat-change.negative {
+            color: #ef4444;
+        }
+        
+        .earnings-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .earnings-card .stat-value {
+            color: #10b981;
+        }
+        
+        .section-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 24px;
+        }
+        
+        .commission-tier {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .commission-tier.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        .tier-badge {
+            padding: 6px 16px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .game-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+        
+        .payout-method {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .payout-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <div class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 8px;">📊 Host Dashboard</h1>
+                <p style="color: var(--gray-400); font-size: 1.125rem;">Welcome back, <span id="hostName">Host</span>!</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card earnings-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="totalEarnings">$0</div>
+                    <div class="stat-label">Total Earnings</div>
+                    <div class="stat-change positive">↑ +15% from last month</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🎮</div>
+                    <div class="stat-value" id="gamesHosted">0</div>
+                    <div class="stat-label">Games Hosted</div>
+                    <div class="stat-change positive">↑ +8 this week</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🎫</div>
+                    <div class="stat-value" id="ticketsSold">0</div>
+                    <div class="stat-label">Tickets Sold</div>
+                    <div class="stat-change positive">↑ +12% growth</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">Average Rating</div>
+                    <div class="stat-change positive">↑ +0.2 this month</div>
+                </div>
+            </div>
+
+            <!-- Today's Performance -->
+            <div class="section-card">
+                <h2 class="section-title">📈 Today's Performance</h2>
+                <div class="stats-grid">
+                    <div>
+                        <div style="color: var(--gray-400); font-size: 0.875rem; margin-bottom: 8px;">Revenue</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: white;" id="todayRevenue">$0</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--gray-400); font-size: 0.875rem; margin-bottom: 8px;">Your Earnings (85%)</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #10b981;" id="todayEarnings">$0</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--gray-400); font-size: 0.875rem; margin-bottom: 8px;">Platform Fee (15%)</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--gray-400);" id="todayFee">$0</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--gray-400); font-size: 0.875rem; margin-bottom: 8px;">Games Today</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: white;" id="todayGames">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                <!-- Commission Tier -->
+                <div class="section-card">
+                    <h2 class="section-title">🏆 Commission Tier</h2>
+                    <div>
+                        <div class="commission-tier">
+                            <div>
+                                <div style="font-weight: 600; color: var(--gray-400); font-size: 0.875rem;">Beginner</div>
+                                <div style="color: var(--gray-500); font-size: 0.75rem;">$0 - $1,000</div>
+                            </div>
+                            <div style="font-weight: 700; color: white;">75%</div>
+                        </div>
+                        <div class="commission-tier">
+                            <div>
+                                <div style="font-weight: 600; color: var(--gray-400); font-size: 0.875rem;">Bronze</div>
+                                <div style="color: var(--gray-500); font-size: 0.75rem;">$1,001 - $5,000</div>
+                            </div>
+                            <div style="font-weight: 700; color: white;">80%</div>
+                        </div>
+                        <div class="commission-tier active">
+                            <div>
+                                <div style="font-weight: 600; color: white; font-size: 0.875rem;">Silver ⭐</div>
+                                <div style="color: rgba(255,255,255,0.7); font-size: 0.75rem;">$5,001 - $15,000</div>
+                            </div>
+                            <div style="font-weight: 700; color: white; display: flex; align-items: center; gap: 8px;">
+                                85%
+                                <span class="tier-badge">Current</span>
+                            </div>
+                        </div>
+                        <div class="commission-tier">
+                            <div>
+                                <div style="font-weight: 600; color: var(--gray-400); font-size: 0.875rem;">Gold</div>
+                                <div style="color: var(--gray-500); font-size: 0.75rem;">$15,001 - $50,000</div>
+                            </div>
+                            <div style="font-weight: 700; color: white;">88%</div>
+                        </div>
+                        <div class="commission-tier">
+                            <div>
+                                <div style="font-weight: 600; color: var(--gray-400); font-size: 0.875rem;">Platinum</div>
+                                <div style="color: var(--gray-500); font-size: 0.75rem;">$50,001+</div>
+                            </div>
+                            <div style="font-weight: 700; color: white;">90%</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 16px; background: rgba(99, 102, 241, 0.1); border-radius: 12px;">
+                        <div style="font-size: 0.875rem; color: var(--gray-400); margin-bottom: 8px;">Next Tier Progress</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 0.875rem; color: white;">$12,000 / $15,000</span>
+                            <span style="font-size: 0.875rem; color: #10b981;">80%</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="background: var(--gradient-primary); height: 100%; width: 80%; border-radius: 4px;"></div>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 8px;">🎯 $3,000 more to reach Gold tier (88% commission)</div>
+                    </div>
+                </div>
+
+                <!-- Payout Methods -->
+                <div class="section-card">
+                    <h2 class="section-title">💳 Payout Methods</h2>
+                    <div>
+                        <div class="payout-method">
+                            <div class="payout-icon">🏦</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: white; margin-bottom: 4px;">Bank Transfer</div>
+                                <div style="font-size: 0.875rem; color: var(--gray-400);">Standard: 24h | Instant: 2h (+2% fee)</div>
+                            </div>
+                            <button class="btn btn-sm btn-primary">Add</button>
+                        </div>
+                        <div class="payout-method">
+                            <div class="payout-icon">💱</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: white; margin-bottom: 4px;">UPI</div>
+                                <div style="font-size: 0.875rem; color: var(--gray-400);">Instant transfers | India only</div>
+                            </div>
+                            <button class="btn btn-sm btn-primary">Add</button>
+                        </div>
+                        <div class="payout-method">
+                            <div class="payout-icon">💎</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: white; margin-bottom: 4px;">Cryptocurrency</div>
+                                <div style="font-size: 0.875rem; color: var(--gray-400);">USDT, BTC | Low fees</div>
+                            </div>
+                            <button class="btn btn-sm btn-primary">Add</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div>
+                                <div style="font-size: 0.875rem; color: var(--gray-400); margin-bottom: 4px;">Available Balance</div>
+                                <div style="font-size: 2rem; font-weight: 800; color: #10b981;" id="availableBalance">$0</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.875rem; color: var(--gray-400); margin-bottom: 4px;">Pending</div>
+                                <div style="font-size: 1.25rem; font-weight: 700; color: var(--gray-400);" id="pendingBalance">$0</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary gradient-shine" style="width: 100%;" onclick="withdrawFunds()">
+                            💸 Withdraw Funds
+                        </button>
+                        <div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 8px; text-align: center;">Minimum withdrawal: $50</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Games -->
+            <div class="section-card">
+                <h2 class="section-title">🕒 Recent Games</h2>
+                <div class="game-list" id="recentGames">
+                    <!-- Games will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <button class="btn btn-large btn-primary gradient-shine" onclick="window.location.href='/host-game.html'">
+                    🎮 Create New Game
+                </button>
+                <button class="btn btn-large btn-glass" onclick="window.location.href='/host-analytics.html'">
+                    📊 View Analytics
+                </button>
+                <button class="btn btn-large btn-glass" onclick="window.location.href='/host-settings.html'">
+                    ⚙️ Settings
+                </button>
+                <button class="btn btn-large btn-glass" onclick="window.location.href='/'">
+                    🏠 Back to Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script>
+        // Initialize dashboard
+        function initDashboard() {
+            const host = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!host.username || host.role !== 'host') {
+                window.location.href = '/auth.html';
+                return;
+            }
+
+            document.getElementById('hostName').textContent = host.username;
+
+            // Demo data
+            const stats = {
+                totalEarnings: 12500,
+                gamesHosted: 156,
+                ticketsSold: 7824,
+                todayRevenue: 850,
+                todayEarnings: 722.50,
+                todayFee: 127.50,
+                todayGames: 6,
+                availableBalance: 3250,
+                pendingBalance: 450
+            };
+
+            // Update stats
+            document.getElementById('totalEarnings').textContent = `$${stats.totalEarnings.toLocaleString()}`;
+            document.getElementById('gamesHosted').textContent = stats.gamesHosted;
+            document.getElementById('ticketsSold').textContent = stats.ticketsSold.toLocaleString();
+            document.getElementById('todayRevenue').textContent = `$${stats.todayRevenue}`;
+            document.getElementById('todayEarnings').textContent = `$${stats.todayEarnings}`;
+            document.getElementById('todayFee').textContent = `$${stats.todayFee}`;
+            document.getElementById('todayGames').textContent = stats.todayGames;
+            document.getElementById('availableBalance').textContent = `$${stats.availableBalance.toLocaleString()}`;
+            document.getElementById('pendingBalance').textContent = `$${stats.pendingBalance}`;
+
+            // Load recent games
+            loadRecentGames();
+        }
+
+        function loadRecentGames() {
+            const games = [
+                { id: 1, name: 'Evening Jackpot', date: 'Today, 6:30 PM', revenue: 350, earnings: 297.50, tickets: 70 },
+                { id: 2, name: 'Quick Cash', date: 'Today, 4:00 PM', revenue: 250, earnings: 212.50, tickets: 50 },
+                { id: 3, name: 'Weekend Special', date: 'Yesterday, 8:00 PM', revenue: 500, earnings: 425, tickets: 100 },
+                { id: 4, name: 'Afternoon Fun', date: 'Yesterday, 2:00 PM', revenue: 150, earnings: 127.50, tickets: 30 },
+                { id: 5, name: 'Mega Prize', date: '2 days ago', revenue: 1000, earnings: 850, tickets: 200 }
+            ];
+
+            const container = document.getElementById('recentGames');
+            container.innerHTML = games.map(game => `
+                <div class="game-item">
+                    <div>
+                        <div style="font-weight: 600; color: white; margin-bottom: 4px;">${game.name}</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-400);">${game.date} • ${game.tickets} tickets</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; color: #10b981; margin-bottom: 4px;">+$${game.earnings}</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-400);">$${game.revenue} revenue</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function withdrawFunds() {
+            const balance = parseFloat(document.getElementById('availableBalance').textContent.replace('$', '').replace(',', ''));
+            
+            if (balance < 50) {
+                toast.error('Minimum withdrawal amount is $50');
+                return;
+            }
+
+            toast.info('Withdrawal feature coming soon! For now, this is a demo.', 3000);
+        }
+
+        // Initialize on load
+        initDashboard();
+
+        // Show welcome message
+        setTimeout(() => {
+            toast.success('📊 Dashboard loaded successfully!', 2000);
+        }, 500);
+    </script>
+</body>
+</html>
