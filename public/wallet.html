@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet - Tambola Live</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/redesign.css">
+</head>
+<body>
+    <div class="background-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <nav class="navbar glass">
+        <div class="container">
+            <div class="nav-wrapper">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="18" fill="url(#logoGradient)"/>
+                            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="22" font-weight="800">T</text>
+                            <defs>
+                                <linearGradient id="logoGradient" x1="0" y1="0" x2="40" y2="40">
+                                    <stop offset="0%" stop-color="#6366f1"/>
+                                    <stop offset="100%" stop-color="#a855f7"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <span class="logo-text">Tambola<span class="accent">Live</span></span>
+                </a>
+                <div class="nav-actions">
+                    <button class="btn btn-ghost" onclick="window.location.href='/dashboard.html'">← Back to Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div style="min-height: 100vh; padding: 140px 0 80px;">
+        <div class="container" style="max-width: 1000px;">
+            <div style="text-align: center; margin-bottom: 48px;">
+                <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; color: white;">Wallet</h1>
+                <p style="color: var(--gray-500); font-size: 1.125rem;">Manage your balance and transactions</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 40px;">
+                <!-- Balance Card -->
+                <div class="glass" style="padding: 40px; border-radius: 24px; text-align: center;">
+                    <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Available Balance</div>
+                    <div style="font-size: 3.5rem; font-weight: 800; color: white; margin-bottom: 20px;" id="walletBalance">$0.00</div>
+                    <button class="btn btn-primary gradient-shine" onclick="showAddMoneyModal()" style="width: 100%;">
+                        <span>💰 Add Money</span>
+                    </button>
+                </div>
+
+                <!-- Quick Stats -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="glass" style="padding: 24px; border-radius: 16px;">
+                        <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 8px;">Total Deposited</div>
+                        <div style="font-size: 1.75rem; font-weight: 800; color: white;">$250.00</div>
+                    </div>
+                    <div class="glass" style="padding: 24px; border-radius: 16px;">
+                        <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 8px;">Total Withdrawn</div>
+                        <div style="font-size: 1.75rem; font-weight: 800; color: white;">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Money Options -->
+            <div class="glass" style="padding: 40px; border-radius: 24px; margin-bottom: 40px;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 24px; color: white;">Quick Add</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px;">
+                    <button class="btn btn-glass" onclick="addMoney(10)" style="padding: 20px;">
+                        <div style="font-size: 1.5rem; font-weight: 800;">$10</div>
+                    </button>
+                    <button class="btn btn-glass" onclick="addMoney(25)" style="padding: 20px;">
+                        <div style="font-size: 1.5rem; font-weight: 800;">$25</div>
+                    </button>
+                    <button class="btn btn-glass" onclick="addMoney(50)" style="padding: 20px;">
+                        <div style="font-size: 1.5rem; font-weight: 800;">$50</div>
+                    </button>
+                    <button class="btn btn-glass" onclick="addMoney(100)" style="padding: 20px;">
+                        <div style="font-size: 1.5rem; font-weight: 800;">$100</div>
+                    </button>
+                    <button class="btn btn-glass" onclick="addMoney(250)" style="padding: 20px;">
+                        <div style="font-size: 1.5rem; font-weight: 800;">$250</div>
+                    </button>
+                    <button class="btn btn-glass" onclick="showAddMoneyModal()" style="padding: 20px;">
+                        <div style="font-size: 1.5rem; font-weight: 800;">Custom</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="glass" style="padding: 40px; border-radius: 24px; margin-bottom: 40px;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 24px; color: white;">Payment Methods</h2>
+                <div style="display: grid; gap: 16px;">
+                    <label style="padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 16px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                        <input type="radio" name="payment" value="card" checked style="width: 20px; height: 20px; accent-color: var(--primary-500);">
+                        <div style="font-size: 1.5rem;">💳</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: white; margin-bottom: 4px;">Credit/Debit Card</div>
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">Visa, Mastercard, Amex</div>
+                        </div>
+                    </label>
+                    <label style="padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 16px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                        <input type="radio" name="payment" value="upi" style="width: 20px; height: 20px; accent-color: var(--primary-500);">
+                        <div style="font-size: 1.5rem;">📱</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: white; margin-bottom: 4px;">UPI</div>
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">GooglePay, PhonePe, Paytm</div>
+                        </div>
+                    </label>
+                    <label style="padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 16px;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                        <input type="radio" name="payment" value="wallet" style="width: 20px; height: 20px; accent-color: var(--primary-500);">
+                        <div style="font-size: 1.5rem;">💼</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: white; margin-bottom: 4px;">E-Wallets</div>
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">PayPal, Skrill, Neteller</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="glass" style="padding: 40px; border-radius: 24px;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 24px; color: white;">Recent Transactions</h2>
+                <div style="display: flex; flex-direction: column; gap: 12px;" id="transactionsList">
+                    <div style="text-align: center; padding: 40px; color: var(--gray-500);">
+                        <div style="font-size: 3rem; margin-bottom: 12px;">💸</div>
+                        <p>No transactions yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!user.username) {
+            window.location.href = '/auth.html';
+        }
+
+        // Update balance display
+        document.getElementById('walletBalance').textContent = `$${user.balance.toFixed(2)}`;
+
+        function showAddMoneyModal() {
+            const amount = prompt('Enter amount to add (in USD):');
+            if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
+                addMoney(parseFloat(amount));
+            }
+        }
+
+        function addMoney(amount) {
+            // Simulate payment
+            if (confirm(`Add $${amount} to your wallet?\n\nPayment method: Credit Card\nProcessing fee: $0`)) {
+                // Update user balance
+                user.balance += amount;
+                localStorage.setItem('user', JSON.stringify(user));
+                
+                // Update display
+                document.getElementById('walletBalance').textContent = `$${user.balance.toFixed(2)}`;
+                
+                // Show success
+                alert(`✅ Success!\n\n$${amount} has been added to your wallet.\nNew balance: $${user.balance.toFixed(2)}`);
+                
+                // Add to transaction history
+                addTransaction('deposit', amount);
+            }
+        }
+
+        function addTransaction(type, amount) {
+            const list = document.getElementById('transactionsList');
+            const transaction = document.createElement('div');
+            transaction.style.cssText = 'padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; display: grid; grid-template-columns: 48px 1fr auto; gap: 16px; align-items: center;';
+            
+            const icon = type === 'deposit' ? '💰' : '🎮';
+            const color = type === 'deposit' ? '#10b981' : '#ef4444';
+            const sign = type === 'deposit' ? '+' : '-';
+            
+            transaction.innerHTML = `
+                <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: var(--gradient-primary);">${icon}</div>
+                <div>
+                    <div style="font-weight: 700; color: white; margin-bottom: 4px;">${type === 'deposit' ? 'Wallet Top-up' : 'Game Purchase'}</div>
+                    <div style="font-size: 0.875rem; color: var(--gray-500);">Just now</div>
+                </div>
+                <div style="font-size: 1.25rem; font-weight: 800; color: ${color};">${sign}$${amount.toFixed(2)}</div>
+            `;
+            
+            if (list.firstChild && list.firstChild.textContent.includes('No transactions')) {
+                list.innerHTML = '';
+            }
+            list.insertBefore(transaction, list.firstChild);
+        }
+    </script>
+</body>
+</html>
