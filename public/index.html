@@ -409,13 +409,13 @@
                     <h2>Ready to Start Winning?</h2>
                     <p>Join 100,000+ players and win real money playing Tambola</p>
                     <div class="cta-buttons">
-                        <button class="btn btn-large btn-primary gradient-shine">
+                        <button class="btn btn-large btn-primary gradient-shine" onclick="window.location.href='/auth.html'">
                             <span>Create Free Account</span>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </button>
-                        <button class="btn btn-large btn-glass">Browse Games</button>
+                        <button class="btn btn-large btn-glass" onclick="document.getElementById('games').scrollIntoView({behavior: 'smooth'})">Browse Games</button>
                     </div>
                     <p class="cta-note">💎 No credit card required • ✅ Instant signup</p>
                 </div>
@@ -486,6 +486,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/js/auth-check.js"></script>
     <script src="/js/redesign.js"></script>
 </body>
 </html>

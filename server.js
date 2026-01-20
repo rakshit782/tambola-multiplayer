@@ -39,6 +39,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.get('/auth', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'auth.html'));
+});
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
@@ -47,15 +51,25 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes (to be added)
+// Auth Routes (always available)
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
+// API Routes (optional - will load if files exist)
 try {
   const gameRoutes = require('./routes/game');
-  const paymentRoutes = require('./routes/payment');
-  
   app.use('/api/game', gameRoutes);
-  app.use('/api/payment', paymentRoutes);
+  console.log('✓ Game routes loaded');
 } catch (error) {
-  console.log('⚠️  Note: Some route files not found yet. They will be created when you run the app.');
+  console.log('ℹ️  Game routes not yet available');
+}
+
+try {
+  const paymentRoutes = require('./routes/payment');
+  app.use('/api/payment', paymentRoutes);
+  console.log('✓ Payment routes loaded');
+} catch (error) {
+  console.log('ℹ️  Payment routes not yet available');
 }
 
 // Socket.IO connection handling
@@ -123,9 +137,14 @@ server.listen(PORT, () => {
   console.log('\x1b[32m%s\x1b[0m', `✓ Server: http://localhost:${PORT}`);
   console.log('\x1b[32m%s\x1b[0m', `✓ Environment: ${NODE_ENV}`);
   console.log('\x1b[32m%s\x1b[0m', `✓ Socket.IO: Ready`);
-  console.log('\x1b[36m%s\x1b[0m', '========================================\n');
-  console.log('\x1b[33m%s\x1b[0m', '👉 Open your browser and visit:');
-  console.log('\x1b[1m%s\x1b[0m', `   http://localhost:${PORT}\n`);
+  console.log('\x1b[32m%s\x1b[0m', `✓ Auth System: Active`);
+  console.log('\x1b[36m%s\x1b[0m', '========================================');
+  console.log('\x1b[33m%s\x1b[0m', '\n📌 Test Accounts:');
+  console.log('\x1b[36m%s\x1b[0m', '   Host:   host@tambola.com   / host123');
+  console.log('\x1b[36m%s\x1b[0m', '   Player: player@tambola.com / player123');
+  console.log('\x1b[33m%s\x1b[0m', '\n👉 Open your browser and visit:');
+  console.log('\x1b[1m%s\x1b[0m', `   http://localhost:${PORT}`);
+  console.log('\x1b[1m%s\x1b[0m', `   http://localhost:${PORT}/auth (Login Page)\n`);
 });
 
 // Graceful shutdown
