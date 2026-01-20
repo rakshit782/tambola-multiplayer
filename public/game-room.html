@@ -6,6 +6,7 @@
     <title>Game Room - Tambola Live</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/redesign.css">
+    <link rel="stylesheet" href="/css/game-room.css">
     <style>
         .game-room {
             min-height: 100vh;
@@ -174,8 +175,8 @@
                     <div class="number-board">
                         <div class="current-number-display">
                             <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Current Number</div>
-                            <div class="number-ball" id="currentNumber">42</div>
-                            <div style="font-size: 1rem; color: var(--gray-400);">Number <span id="callCount">1</span> of 90</div>
+                            <div class="number-ball" id="currentNumber">-</div>
+                            <div style="font-size: 1rem; color: var(--gray-400);">Number <span id="callCount">0</span> of 90</div>
                         </div>
 
                         <div style="margin-bottom: 24px;">
@@ -188,13 +189,19 @@
 
                     <!-- Your Tickets -->
                     <div class="number-board" style="margin-top: 24px;">
-                        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; color: white;">Your Tickets</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="font-size: 1.25rem; font-weight: 700; color: white;">Your Tickets</h3>
+                            <div class="balance-card" style="margin: 0;">
+                                <span class="balance-label">Balance:</span>
+                                <span class="balance-amount" id="userBalance">$0.00</span>
+                            </div>
+                        </div>
                         <div id="ticketsContainer">
                             <!-- Tickets will be loaded here -->
-                            <div style="text-align: center; padding: 40px; color: var(--gray-500);">
-                                <div style="font-size: 3rem; margin-bottom: 12px;">🎫</div>
+                            <div class="no-tickets">
+                                <div class="no-tickets-icon">🎫</div>
                                 <p>You haven't purchased any tickets for this game</p>
-                                <button class="btn btn-primary" style="margin-top: 16px;">Buy Ticket - $5</button>
+                                <button class="btn btn-primary buy-ticket-btn" id="buyTicketBtn">Buy Ticket - $5</button>
                             </div>
                         </div>
                     </div>
@@ -240,13 +247,6 @@
                                     <div style="font-size: 0.75rem; color: var(--gray-500);">Host</div>
                                 </div>
                             </div>
-                            <div class="player-item">
-                                <div class="player-avatar">👤</div>
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; color: white; font-size: 0.875rem;">player_demo</div>
-                                    <div style="font-size: 0.75rem; color: var(--gray-500);">You</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -265,6 +265,7 @@
     </div>
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/js/game-room.js"></script>
     <script>
         // Generate numbers grid (1-90)
         const numbersGrid = document.getElementById('numbersGrid');
@@ -276,49 +277,90 @@
             numbersGrid.appendChild(chip);
         }
 
-        // Simulate number calling (demo)
-        let currentNum = 42;
-        let callCount = 1;
-        const calledNumbers = [42];
-        
-        document.getElementById('num-42').classList.add('called');
+        // Initialize game room
+        initGameRoom();
+
+        // Game state
+        let currentNum = null;
+        let callCount = 0;
+        const calledNumbers = [];
 
         // Socket.IO connection
         const socket = io();
         
         socket.on('connect', () => {
-            console.log('Connected to game server');
+            console.log('✅ Connected to game server');
             socket.emit('join-game', { gameCode: 'GAME123' });
+            
+            // Add current player to list
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.username) {
+                const playersList = document.getElementById('playersList');
+                playersList.insertAdjacentHTML('beforeend', `
+                    <div class="player-item">
+                        <div class="player-avatar">👤</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: white; font-size: 0.875rem;">${user.username}</div>
+                            <div style="font-size: 0.75rem; color: var(--gray-500);">You</div>
+                        </div>
+                    </div>
+                `);
+            }
         });
 
         socket.on('number-called', (data) => {
             const number = data.number;
-            document.getElementById('currentNumber').textContent = number;
-            document.getElementById(`num-${number}`).classList.add('called');
-            callCount++;
-            document.getElementById('callCount').textContent = callCount;
+            markNumber(number);
         });
 
-        // Demo: Auto-call numbers every 3 seconds
-        setInterval(() => {
-            if (callCount < 90) {
-                let newNum;
-                do {
-                    newNum = Math.floor(Math.random() * 90) + 1;
-                } while (calledNumbers.includes(newNum));
-                
-                calledNumbers.push(newNum);
-                currentNum = newNum;
+        socket.on('claim-result', (data) => {
+            if (data.valid) {
+                showNotification(`🎉 Congratulations! You won $${data.prizeAmount} for ${data.claimType}!`, 'success');
+                // Update balance
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                user.balance += data.prizeAmount;
+                localStorage.setItem('user', JSON.stringify(user));
+                updateBalanceDisplay();
+            } else {
+                showNotification('❌ Invalid claim! Try again.', 'error');
+            }
+        });
+
+        // Mark number on board and tickets
+        function markNumber(number) {
+            if (!calledNumbers.includes(number)) {
+                calledNumbers.push(number);
                 callCount++;
+                currentNum = number;
                 
-                document.getElementById('currentNumber').textContent = currentNum;
-                document.getElementById(`num-${currentNum}`).classList.add('called');
+                document.getElementById('currentNumber').textContent = number;
+                document.getElementById(`num-${number}`).classList.add('called');
                 document.getElementById('callCount').textContent = callCount;
                 
-                // Emit to other players
-                socket.emit('call-number', { gameCode: 'GAME123', number: currentNum });
+                // Auto-mark on tickets
+                if (window.onNumberCalled) {
+                    window.onNumberCalled(number);
+                }
             }
-        }, 3000);
+        }
+
+        // Demo: Auto-call numbers every 3 seconds
+        setTimeout(() => {
+            const autoCall = setInterval(() => {
+                if (callCount < 90) {
+                    let newNum;
+                    do {
+                        newNum = Math.floor(Math.random() * 90) + 1;
+                    } while (calledNumbers.includes(newNum));
+                    
+                    markNumber(newNum);
+                    socket.emit('call-number', { gameCode: 'GAME123', number: newNum });
+                } else {
+                    clearInterval(autoCall);
+                    showNotification('🎊 Game Over! All numbers called.', 'success');
+                }
+            }, 3000);
+        }, 2000); // Start after 2 seconds
     </script>
 </body>
 </html>
