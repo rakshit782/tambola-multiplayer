@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Room - Tambola Live</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/redesign.css">
+    <style>
+        .game-room {
+            min-height: 100vh;
+            padding: 100px 0 40px;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .game-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 32px;
+        }
+        
+        .number-board {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+        }
+        
+        .current-number-display {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .number-ball {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 20px 60px rgba(99,102,241,0.4);
+            animation: numberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes numberPop {
+            0% { transform: scale(0) rotate(-180deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        .numbers-called-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+        }
+        
+        .number-chip {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        
+        .number-chip.called {
+            background: var(--gradient-primary);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .sidebar-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .panel-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+        
+        .panel-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: white;
+        }
+        
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .player-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+        
+        .player-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <div class="game-room">
+        <div class="container">
+            <div class="game-header">
+                <div class="game-status">
+                    <span style="width: 8px; height: 8px; background: white; border-radius: 50%;"></span>
+                    <span>🎮 GAME LIVE</span>
+                </div>
+                <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; color: white;">Quick Cash Game</h1>
+                <p style="color: var(--gray-500); font-size: 1.125rem;">Game #12345 • Hosted by TambolaLive</p>
+            </div>
+
+            <div class="game-layout">
+                <!-- Main Board -->
+                <div>
+                    <div class="number-board">
+                        <div class="current-number-display">
+                            <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Current Number</div>
+                            <div class="number-ball" id="currentNumber">42</div>
+                            <div style="font-size: 1rem; color: var(--gray-400);">Number <span id="callCount">1</span> of 90</div>
+                        </div>
+
+                        <div style="margin-bottom: 24px;">
+                            <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: white;">Numbers Called</h3>
+                            <div class="numbers-called-grid" id="numbersGrid">
+                                <!-- Numbers 1-90 will be generated -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Your Tickets -->
+                    <div class="number-board" style="margin-top: 24px;">
+                        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; color: white;">Your Tickets</h3>
+                        <div id="ticketsContainer">
+                            <!-- Tickets will be loaded here -->
+                            <div style="text-align: center; padding: 40px; color: var(--gray-500);">
+                                <div style="font-size: 3rem; margin-bottom: 12px;">🎫</div>
+                                <p>You haven't purchased any tickets for this game</p>
+                                <button class="btn btn-primary" style="margin-top: 16px;">Buy Ticket - $5</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar-panel">
+                    <!-- Prize Pool -->
+                    <div class="panel-card">
+                        <h3 class="panel-title">💰 Prize Pool</h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                                <span style="color: var(--gray-400); font-size: 0.875rem;">Early Five</span>
+                                <span style="font-weight: 700; color: white;">$50</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                                <span style="color: var(--gray-400); font-size: 0.875rem;">Top Line</span>
+                                <span style="font-weight: 700; color: white;">$75</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                                <span style="color: var(--gray-400); font-size: 0.875rem;">Middle Line</span>
+                                <span style="font-weight: 700; color: white;">$75</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                                <span style="color: var(--gray-400); font-size: 0.875rem;">Bottom Line</span>
+                                <span style="font-weight: 700; color: white;">$75</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(245,158,11,0.1) 100%); border: 1px solid rgba(251,191,36,0.2); border-radius: 8px;">
+                                <span style="color: #fbbf24; font-weight: 700;">🏆 Full House</span>
+                                <span style="font-weight: 800; color: #fbbf24; font-size: 1.125rem;">$200</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Players -->
+                    <div class="panel-card">
+                        <h3 class="panel-title">👥 Players (45/100)</h3>
+                        <div class="player-list" id="playersList">
+                            <div class="player-item">
+                                <div class="player-avatar">👑</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: white; font-size: 0.875rem;">TambolaLive</div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-500);">Host</div>
+                                </div>
+                            </div>
+                            <div class="player-item">
+                                <div class="player-avatar">👤</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: white; font-size: 0.875rem;">player_demo</div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-500);">You</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Game Controls -->
+                    <div class="panel-card">
+                        <button class="btn btn-glass" style="width: 100%; margin-bottom: 12px;">
+                            📊 View Stats
+                        </button>
+                        <button class="btn btn-glass" style="width: 100%;" onclick="window.location.href='/'">
+                            🚪 Leave Game
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // Generate numbers grid (1-90)
+        const numbersGrid = document.getElementById('numbersGrid');
+        for (let i = 1; i <= 90; i++) {
+            const chip = document.createElement('div');
+            chip.className = 'number-chip';
+            chip.textContent = i;
+            chip.id = `num-${i}`;
+            numbersGrid.appendChild(chip);
+        }
+
+        // Simulate number calling (demo)
+        let currentNum = 42;
+        let callCount = 1;
+        const calledNumbers = [42];
+        
+        document.getElementById('num-42').classList.add('called');
+
+        // Socket.IO connection
+        const socket = io();
+        
+        socket.on('connect', () => {
+            console.log('Connected to game server');
+            socket.emit('join-game', { gameCode: 'GAME123' });
+        });
+
+        socket.on('number-called', (data) => {
+            const number = data.number;
+            document.getElementById('currentNumber').textContent = number;
+            document.getElementById(`num-${number}`).classList.add('called');
+            callCount++;
+            document.getElementById('callCount').textContent = callCount;
+        });
+
+        // Demo: Auto-call numbers every 3 seconds
+        setInterval(() => {
+            if (callCount < 90) {
+                let newNum;
+                do {
+                    newNum = Math.floor(Math.random() * 90) + 1;
+                } while (calledNumbers.includes(newNum));
+                
+                calledNumbers.push(newNum);
+                currentNum = newNum;
+                callCount++;
+                
+                document.getElementById('currentNumber').textContent = currentNum;
+                document.getElementById(`num-${currentNum}`).classList.add('called');
+                document.getElementById('callCount').textContent = callCount;
+                
+                // Emit to other players
+                socket.emit('call-number', { gameCode: 'GAME123', number: currentNum });
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
