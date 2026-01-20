@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambola Multiplayer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎲 Tambola Multiplayer</h1>
+        </header>
+
+        <div id="homeScreen" class="screen active">
+            <div class="card">
+                <h2>Welcome to Tambola!</h2>
+                <div class="button-group">
+                    <button onclick="showHostScreen()" class="btn btn-primary">Host a Game</button>
+                    <button onclick="showJoinScreen()" class="btn btn-secondary">Join a Game</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="hostScreen" class="screen">
+            <div class="card">
+                <h2>Host a Game</h2>
+                <input type="text" id="hostName" placeholder="Your Name" class="input">
+                <input type="number" id="entryFee" placeholder="Entry Fee (₹)" value="100" class="input">
+                <div class="button-group">
+                    <button onclick="createGame()" class="btn btn-primary">Create Game</button>
+                    <button onclick="showHomeScreen()" class="btn btn-secondary">Back</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="joinScreen" class="screen">
+            <div class="card">
+                <h2>Join a Game</h2>
+                <input type="text" id="playerName" placeholder="Your Name" class="input">
+                <input type="text" id="gameCode" placeholder="Game Code" class="input" style="text-transform: uppercase;">
+                <div class="button-group">
+                    <button onclick="joinGame()" class="btn btn-primary">Join & Pay</button>
+                    <button onclick="showHomeScreen()" class="btn btn-secondary">Back</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="lobbyScreen" class="screen">
+            <div class="card">
+                <h2>Game Lobby</h2>
+                <div class="info-box">
+                    <p><strong>Game Code:</strong> <span id="lobbyGameCode" class="highlight"></span></p>
+                    <p><strong>Players:</strong> <span id="playerCount">0</span></p>
+                    <p><strong>Prize Pool:</strong> ₹<span id="prizePool">0</span></p>
+                </div>
+                <div id="playersList" class="players-list"></div>
+                <div id="hostControls" style="display: none;">
+                    <button onclick="startGame()" class="btn btn-success">Start Game</button>
+                </div>
+                <p class="waiting-text">Waiting for host to start the game...</p>
+            </div>
+        </div>
+
+        <div id="gameScreen" class="screen">
+            <div class="game-layout">
+                <div class="game-info">
+                    <div class="info-card">
+                        <h3>Current Number</h3>
+                        <div id="currentNumber" class="current-number">-</div>
+                    </div>
+                    <div class="info-card">
+                        <h3>Called Numbers</h3>
+                        <div id="calledNumbers" class="called-numbers"></div>
+                    </div>
+                </div>
+
+                <div class="ticket-container">
+                    <h3>Your Ticket</h3>
+                    <div id="ticket" class="ticket"></div>
+                    <div class="claims">
+                        <button onclick="claimWin('earlyFive')" class="btn btn-claim">Early Five</button>
+                        <button onclick="claimWin('topLine')" class="btn btn-claim">Top Line</button>
+                        <button onclick="claimWin('middleLine')" class="btn btn-claim">Middle Line</button>
+                        <button onclick="claimWin('bottomLine')" class="btn btn-claim">Bottom Line</button>
+                        <button onclick="claimWin('fullHouse')" class="btn btn-claim">Full House</button>
+                    </div>
+                </div>
+
+                <div id="masterControls" style="display: none;" class="master-controls">
+                    <button onclick="callNumber()" class="btn btn-primary btn-large">Call Next Number</button>
+                </div>
+
+                <div id="winners" class="winners"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
