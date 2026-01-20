@@ -486,7 +486,18 @@
 
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/loading.js"></script>
     <script src="/js/auth-check.js"></script>
     <script src="/js/redesign.js"></script>
+    <script>
+        // Show welcome message for new visitors
+        if (!localStorage.getItem('visited')) {
+            setTimeout(() => {
+                toast.success('🎉 Welcome to Tambola Live! Browse games and start playing.', 4000);
+                localStorage.setItem('visited', 'true');
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
