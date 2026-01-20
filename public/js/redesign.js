@@ -161,7 +161,7 @@ function loadGames(filter = 'all') {
     }
     
     gamesGrid.innerHTML = filteredGames.map(game => `
-        <div class="game-card glass" onclick="joinGame(${game.id})">
+        <div class="game-card glass" style="cursor: pointer;" data-game-id="${game.id}">
             <div class="game-card-header">
                 <div>
                     <h3 class="game-title">${game.title}</h3>
@@ -200,7 +200,7 @@ function loadGames(filter = 'all') {
                 </div>
             </div>
             
-            <button class="btn btn-primary gradient-shine" style="width: 100%;" onclick="event.stopPropagation(); joinGame(${game.id})">
+            <button class="btn btn-primary gradient-shine game-join-btn" style="width: 100%;" data-game-id="${game.id}">
                 <span>${game.status === 'live' ? 'Join Now' : 'Reserve Seat'}</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -208,6 +208,26 @@ function loadGames(filter = 'all') {
             </button>
         </div>
     `).join('');
+    
+    // Add click handlers to game cards
+    document.querySelectorAll('.game-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Don't trigger if clicking on the button
+            if (e.target.closest('.game-join-btn')) return;
+            
+            const gameId = this.dataset.gameId;
+            joinGame(gameId);
+        });
+    });
+    
+    // Add click handlers to buttons
+    document.querySelectorAll('.game-join-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const gameId = this.dataset.gameId;
+            joinGame(gameId);
+        });
+    });
 }
 
 // Join game function
@@ -215,13 +235,20 @@ function joinGame(gameId) {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     
     if (!user.username) {
-        window.location.href = '/auth.html';
+        // Show login prompt
+        const shouldLogin = confirm('🎮 You need to login to join games!\n\nClick OK to go to login page, or Cancel to browse as guest.');
+        if (shouldLogin) {
+            window.location.href = '/auth.html';
+        }
         return;
     }
     
     // Redirect to game room
     window.location.href = `/game-room.html?game=${gameId}`;
 }
+
+// Make joinGame globally accessible
+window.joinGame = joinGame;
 
 // Load games on page load
 if (document.getElementById('liveGames')) {
@@ -237,6 +264,35 @@ if (mobileMenuBtn) {
         const navMenu = document.querySelector('.nav-menu');
         navMenu.classList.toggle('active');
         mobileMenuBtn.classList.toggle('active');
+    });
+}
+
+// Hero CTA buttons
+const playNowHero = document.getElementById('playNowHero');
+if (playNowHero) {
+    playNowHero.addEventListener('click', () => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.username) {
+            // Scroll to games
+            document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // Go to auth
+            window.location.href = '/auth.html';
+        }
+    });
+}
+
+const getStartedBtn = document.getElementById('getStartedBtn');
+if (getStartedBtn) {
+    getStartedBtn.addEventListener('click', () => {
+        window.location.href = '/auth.html';
+    });
+}
+
+const signInBtn = document.getElementById('signInBtn');
+if (signInBtn) {
+    signInBtn.addEventListener('click', () => {
+        window.location.href = '/auth.html';
     });
 }
 
